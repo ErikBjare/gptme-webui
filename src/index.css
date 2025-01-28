@@ -121,6 +121,7 @@
 
 .chat-message details {
   @apply my-2 rounded-lg overflow-hidden border border-border text-sm;
+  max-width: 50em;
 }
 
 .chat-message details summary {
