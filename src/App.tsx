@@ -4,7 +4,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ApiProvider } from './contexts/ApiContext';
+import { ApiVersionProvider, useApiVersion } from './contexts/ApiVersionContext';
 import Index from './pages/Index';
+import IndexV2 from './pages/IndexV2';
 import type { FC } from 'react';
 
 const queryClient = new QueryClient({
@@ -32,11 +34,12 @@ const queryClient = new QueryClient({
 
 const AppContent: FC = () => {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+  const { apiVersion } = useApiVersion();
 
   return (
     <ApiProvider initialBaseUrl={apiUrl} queryClient={queryClient}>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <Index />
+        {apiVersion === 'v1' ? <Index /> : <IndexV2 />}
         <Toaster />
         <Sonner />
       </BrowserRouter>
@@ -48,7 +51,9 @@ const App: FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AppContent />
+        <ApiVersionProvider>
+          <AppContent />
+        </ApiVersionProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

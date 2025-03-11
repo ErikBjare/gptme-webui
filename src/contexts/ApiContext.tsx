@@ -1,18 +1,23 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { createApiClient } from '@/utils/api';
-import type { ApiClient } from '@/utils/api';
+import { createApiClientV2 } from '@/utils/apiV2';
+import type { ApiClientV2 } from '@/utils/apiV2';
 import type { QueryClient } from '@tanstack/react-query';
 
 interface ApiContextType {
-  api: ApiClient;
+  api: ApiClientV2;
   isConnected: boolean;
   baseUrl: string;
   setBaseUrl: (url: string) => void;
-  // Add methods from ApiClient that are used in components
-  getConversation: ApiClient['getConversation'];
-  sendMessage: ApiClient['sendMessage'];
-  generateResponse: ApiClient['generateResponse'];
-  cancelPendingRequests: ApiClient['cancelPendingRequests'];
+  // Methods from ApiClientV2 that are used in components
+  getConversation: ApiClientV2['getConversation'];
+  sendMessage: ApiClientV2['sendMessage'];
+  generateResponse: ApiClientV2['generateResponse'];
+  confirmTool: ApiClientV2['confirmTool']; // New method for tool confirmation
+  interruptGeneration: ApiClientV2['interruptGeneration']; // New method for interruption
+  cancelPendingRequests: ApiClientV2['cancelPendingRequests'];
+  // Add event stream methods
+  subscribeToEvents: ApiClientV2['subscribeToEvents'];
+  closeEventStream: ApiClientV2['closeEventStream'];
 }
 
 const ApiContext = createContext<ApiContextType | null>(null);
@@ -27,7 +32,7 @@ export function ApiProvider({
   queryClient: QueryClient;
 }) {
   const [baseUrl, setBaseUrl] = useState(initialBaseUrl);
-  const [api, setApi] = useState(() => createApiClient(initialBaseUrl));
+  const [api, setApi] = useState(() => createApiClientV2(initialBaseUrl));
   const [isConnected, setIsConnected] = useState(false);
 
   // Attempt initial connection
@@ -55,7 +60,7 @@ export function ApiProvider({
   const updateBaseUrl = async (newUrl: string) => {
     try {
       setBaseUrl(newUrl);
-      const newApi = createApiClient(newUrl);
+      const newApi = createApiClientV2(newUrl);
 
       // Update connection status
       const connected = await newApi.checkConnection();
@@ -91,7 +96,12 @@ export function ApiProvider({
         getConversation: api.getConversation.bind(api),
         sendMessage: api.sendMessage.bind(api),
         generateResponse: api.generateResponse.bind(api),
+        confirmTool: api.confirmTool.bind(api), // New method for tool confirmation
+        interruptGeneration: api.interruptGeneration.bind(api), // New method for interruption
         cancelPendingRequests: api.cancelPendingRequests.bind(api),
+        // Add event stream methods
+        subscribeToEvents: api.subscribeToEvents.bind(api),
+        closeEventStream: api.closeEventStream.bind(api),
       }}
     >
       {children}

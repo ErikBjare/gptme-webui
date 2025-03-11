@@ -1,5 +1,6 @@
 import { ThemeToggle } from './ThemeToggle';
 import { ConnectionButton } from './ConnectionButton';
+import { ApiVersionSwitcher } from './ApiVersionSwitcher';
 
 import type { FC } from 'react';
 
@@ -10,7 +11,8 @@ export const MenuBar: FC = () => {
         <img src="https://gptme.org/media/logo.png" alt="gptme logo" className="w-4" />
         <span className="font-mono text-base font-semibold">gptme</span>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
+        <ApiVersionSwitcher />
         <ConnectionButton />
         <ThemeToggle />
       </div>
